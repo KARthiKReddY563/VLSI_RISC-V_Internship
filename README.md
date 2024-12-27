@@ -34,7 +34,7 @@ The address of the main section is 100B0(Hex) and we got 11 instructions.
 
 Simulation using Spike Tool
 
-![Screenshot 2024-12-27 232534](https://github.com/user-attachments/assets/c94a5722-66e3-4107-af07-de7df20f0375)
+![image](https://github.com/user-attachments/assets/0498acd6-e3f4-4b28-b588-c4ad9208f986)
 
 Assembly language code of the  **Karthik.c**
 
