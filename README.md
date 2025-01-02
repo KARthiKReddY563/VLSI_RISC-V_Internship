@@ -82,4 +82,299 @@ The address of the main section is 100b0 (Hexadecimal) and got 34 instructions
 Debugging using Spike Tool
 
 ![Screenshot 2024-12-27 235903](https://github.com/user-attachments/assets/23326adb-5a32-4d67-8c1a-55e9ef8d28bf)
+## Task 3 
+
+#### RISC-V ISA Set
+RISC-V instructions are divided into several types based on the format of their encoding. The main instruction types are:
+
+1. 	R-Type (Register-type): These instructions involve registers and typically use three registers.  They are used for arithmetic operations, logic operations, and some others. The entire 32-bit instruction is divided into six fields.
+
+![image](https://github.com/user-attachments/assets/1ec81d4c-93d6-4671-8808-8a9b2d84776d)
+    
+- [31:25] funct7: Specifies additional control signals for the operation, often used to differentiate between instructions in combination with funct3.
+- [24:20] rs2: Source register 2 (second operand for the operation).
+- [19:15] rs1: Source register 1 (first operand for the operation).
+-	[14:12] funct3: Specifies the operation to perform (e.g., add, subtract) in combination with opcode and funct7.
+- [11:7] rd: Destination register (where the result of the operation is stored).
+- [6:0] opcode: Specifies the instruction type (e.g., R-Type, I-Type).
+- Example: ADD, SUB, AND, OR, XOR
+2.	I-Type (Immediate-type): These instructions involve an immediate value (constant) & a source register that is used for arithmetic, logic, and memory operation.
+
+![image](https://github.com/user-attachments/assets/64d82926-157d-4756-924d-b0f58e54f3b4)
+
+- [31:20] imm[11:0]: Immediate value (constant) used as an operand in the instruction.
+-	[19:15] rs1: Source register 1 (first operand).
+-	[14:12] funct3: Specifies the operation in combination with the opcode.
+-	[11:7] rd: Destination register (where the result is stored).
+-	[6:0] opcode: Specifies the instruction type.
+-	Example: ADDI, ANDI, LUI, JALR
+3.	S-Type (Store-type): These instructions are used for store operations that store data into memory from a register.
+ ![image](https://github.com/user-attachments/assets/c879b538-d05c-4ca3-83fb-58c3ff6c95a7)
+
+-	[31:25] imm[11:5]: Upper 7 bits of the immediate value.
+-	[24:20] rs2: Source register 2 (data to store in memory).
+-	[19:15] rs1: Base register for the memory address calculation.
+-	[14:12] funct3: Specifies the operation (e.g., store byte or word).
+-	[11:7] imm[4:0]: Lower 5 bits of the immediate value.
+-	[6:0] opcode: Specifies the instruction type.
+-	Example: SW, SH, SB
+       
+4.	 B-Type (Branch-type): These are branch operations used for conditional branching.
+ ![image](https://github.com/user-attachments/assets/d1e52356-e7a6-4a9d-ab08-eb46b440d6a4)
+-	[31] imm[12]: Most significant bit of the immediate value.
+-	[30:25] imm[10:5]: Bits 10 to 5 of the immediate value.
+-	[24:20] rs2: Second source register (used for comparison).
+-	[19:15] rs1: First source register (used for comparison).
+-	[14:12] funct3: Specifies the branch condition (e.g., equal, not equal).
+-	[11:8] imm[4:1]: Bits 4 to 1 of the immediate value.
+-	[7] imm[11]: Bit 11 of the immediate value.
+-	[6:0] opcode: Specifies the instruction type.
+-	Example: BEQ, BNE, BLT, BGE
+5.	U-Type (Upper immediate-type): These instructions involve loading large immediate values into registers, typically used for the upper 20 bits of addresses.
+ ![image](https://github.com/user-attachments/assets/4cd93872-8bdf-47c8-a419-f83d4386ed77)
+-	[31:12] imm[31:12]: Immediate value (20 most significant bits) loaded into the upper bits of a register.
+-	[11:7] rd: Destination register.
+-	[6:0] opcode: Specifies the instruction type.
+-	Example: LUI, AUIPC
+
+6.	J-Type (Jump-type): These instructions are used for unconditional jumps (typically for function calls and returns).
+ ![image](https://github.com/user-attachments/assets/33af4804-9ec6-468f-ab1b-7b97565a0336)
+-	[31] imm[20]: Most significant bit of the immediate value.
+-	[30:21] imm[10:1]: Bits 10 to 1 of the immediate value.
+-	[20] imm[11]: Bit 11 of the immediate value.
+-	[19:12] imm[19:12]: Bits 19 to 12 of the immediate value.
+-	[11:7] rd: Destination register (stores the return address after the jump).
+-	[6:0] opcode: Specifies the instruction type.
+-	Example: JAL, JALR
+
+
+![Screenshot 2025-01-02 125512](https://github.com/user-attachments/assets/b3c607cf-0f3b-4389-8cf5-0495fcf5d95b)
+
+Here are the 15 unique RISC-V instructions from riscv-objdmp of Factorial.o
+
+- lui a0, 0x2b
+- addi sp, sp, -48
+- sd ra, 40(sp)
+- jal ra, 104d8
+- li a1, 1
+- mv a5, s1
+- addiw s0, a5, -1
+- blez s1, 10130
+- auipc a5, 0xffff0
+- bnez s0, 100ec
+- sext.w a1, a0
+- lw s1, 12(sp)
+- ld s0, 32(sp)
+- ret
+- beqz a5, 10150
+
+
+Let's analyse each instruction one by one
+
+```
+lui a0, 0x2b
+```  
+> * Instruction Type: LUI (Load Upper Immediate)
+> * Format: imm[31:12] | rd | opcode
+> *	imm[31:12] = 0x2b (0000000000101011)  
+> * Opcode for lui = 0110111   
+> * rd = a0 = 01000 
+
+  
+**32 bits instruction :**```0000000000101011_01010_0110111```   
+
+Hex: ``` 0002B537 ```
+________________________________________
+________________________________________
+
+
+```
+addi sp, sp, -48
+```  
+> * Instruction Type: I-type (Immediate Arithmetic)
+> * Format: imm[11:0] | rs1 | func3 | rd | opcode
+> *	imm[11:0] = -48 = 1111111111011000  (two's complement of 48) 
+> * Opcode for addi = 0010011   
+> * rs1 = sp = 00010
+> * rd = sp = 00010 
+> * func3 = 000 
+
+  
+**32 bits instruction :** ```1111111111011000_00010_000_00010_0010011```   
+
+Hex: ``` 0xFD010113  ```
+________________________________________
+________________________________________
+
+```
+sd ra, 40(sp)
+```  
+> * Instruction Type: S-type (Store)
+> * Format: imm[11:5] | rs2 | rs1 | func3 | imm[4:0] | opcode
+> *	imm[11:5] = 40 = 000000010000
+> * Opcode for sd = 0100011  
+> * rs1 = sp = 00010
+> * rs2 = ra = 00001
+> * func3 = 011
+
+  
+**32 bits instruction :** ```0000000_00001_00010_011_01000_0100011```  
+
+Hex: ``` 0x02113423  ```
+________________________________________
+```
+jal ra, 104d8
+```  
+> * Instruction Type:  J-type (Jump)
+> * Format:imm[20] | imm[10:1] | imm[11] | imm[19:12] | rd | opcode
+> *	imm[20] = 0
+> * imm[10:1] = 0000000001
+> * imm[11] = 0
+> * imm[19:12] = 00010000
+> * imm[11] = 0
+> * Opcode for jal = 1101111  
+> * rd = ra = 00000
+
+  
+**32 bits instruction :** ```0000000_0000000001_0_00010000_00000_1101111 ```
+
+Hex: ``` 0x410000ef  ```
+```
+lw s1, 12(sp)
+```  
+> * Instruction Type:  I-type (Load)
+> * Format: imm[11:0] | rs1 | func3 | rd | opcode
+> *	imm[11:0] = 12 = 000000001100
+> * rs1 = sp = 00010
+> * rd = s1 = 10001
+> * func3 = 010
+> * Opcode for lw = 0000011  
+
+**32 bits instruction :** ```000000001100_00010_010_01001_0000011```  
+Hex: ``` 0x410000ef  ```
+```
+ blez s1, 10130
+```  
+> * Instruction Type:  B-type (Branch)
+> * Format: imm[12] | imm[10:5] | rs2 | rs1 | func3 | imm[4:1] | imm[11] | opcode
+> *	imm = 10130 = 0000001001100
+> * rs2 = zero = 00000
+> * rs1 = s1 = 10001
+> * func3 = 110
+> * Opcode for blez = 1100011   
+
+**32 bits instruction :** ```000000000000_01001_110_1010_11100011``` 
+Hex: ``` 0x410000ef  ```
+
+```
+mv a5, s1 
+```  
+> * Instruction Type: R-type (Register Operation)
+> * Format: funct7 | rs2 | rs1 | funct3 | rd | opcode
+
+> * rs2 = zero = 00000
+> * rs1 = s1 = 10001
+> * func3 = 000
+> * func7 = 0000000 
+> * Opcode for mv = 0110011   
+> * mv a5, s1 is Equivalent to addi a5, s1, 0
+**32 bits instruction :** ```0000000_00000_01001_000_01111_0110011``` 
+Hex: ``` 00048793  ```
+________________________________________
+```
+li a1, 1
+```  
+> * Instruction Type:  I-type (Immediate Load)
+> * Format: imm[11:0] | rs1 | func3 | rd | opcode
+> *	imm[11:0] = 1 = 000000000001
+> * rs1 = zero = 00000
+> * rd = a1 = 01101
+> * func3 = 000
+> * Opcode for li = 0010011   
+
+**32 bits instruction :** ```000000000001_00000_000_01011_0010011``` 
+Hex: ``` 00100593  ```
+
+```
+addiw s0, a5, -1
+```  
+> * Instruction Type:  I-type (Immediate Load)
+> * Format: imm[11:0] | rs1 | func3 | rd | opcode
+> *	imm[11:0] = -1 = 111111111111
+> * rs1 = a5 = 00101
+> * rd = s0 = 10000
+> * func3 = 000
+> * Opcode for addiw = 0010011  
+
+**32 bits instruction :** ```111111111111_00101_000_10000_0011011``` 
+Hex: ``` fff7841b  ```
+```
+sext.w a1, a0
+```  
+> * Instruction Type:  R-type (Register Operation)
+> * Format: funct7 | rs2 | rs1 | funct3 | rd | opcode
+> * rs1 = a0 = 01010
+> * rs2 = zero = 00000
+> * rd = a1 = 01011
+> * func3 = 001
+> * func7 = 0000000
+> * Opcode for addiw = 0010011  
+
+**32 bits instruction :** ```0000000_00000_01010_000_01011_0010011```
+Hex: ``` 0x0005059b  ```
+```
+bnez s0, 100ec
+```  
+> * Instruction Type:  B-type (Branch)
+> * Format:  imm[12] | imm[10:5] | rs2 | rs1 | func3 | imm[4:1] | imm[11] | opcode
+> imm[12|10:5] = 111111
+> * rs1 = s0 = 01000
+> * rs2 = zero = 00000
+> * func3 = 001
+> * imm[4:1|11] = 1100
+> * Opcode for bnez = 1100011  
+
+**32 bits instruction :** ```111111_00000_01000_001_1100_1100011```
+0xfe0416e3 Hex: ``` 0x0005059b  ```
+```
+ld ra, 40(sp)
+```  
+> * Instruction Type:  I-type (Load)
+> * Format:  imm[11:0] | rs1 | func3 | rd | opcode
+> * imm[11:0] = 40 = 0000000001000000
+> * rs1 = sp = 00010
+> * rd = ra = 00001
+> * func3 = 011
+> * Opcode for ld = 0000011  
+
+**32 bits instruction :** ```000000000100_00010_011_00001_0000011```
+Hex: ``` 0x00050x02812483059b  ```
+```
+auipc a5, 0xffff0
+```  
+> * Instruction Type: AUIPC (Add Upper Immediate to PC)
+> * Format:   imm[31:12] | rd | opcode
+> * imm[31:12] = 111111111111000000 
+> * rd = 01111
+> * Opcode for auipc = 0010111   
+
+**32 bits instruction :** ```111111111111_000000_01111_0010111```
+Hex: ``` 0xffff0797  ```
+```
+ beqz a5, 10150 <register_fini+0x18>
+```  
+> * Instruction Type:  BEQZ (Branch if Equal to Zero)
+> * Format:  imm[12] | imm[10:5] | rs2 | rs1 | func3 | imm[4:1] | imm[11] | opcode
+> * imm[12] = 0 = 0 
+> * imm[10:5] = 0000000 = 0000000
+> * rs2 = 00000 = 00000
+> * rs1 = a5 = 00101 = 00101
+> * func3 = 000 = 000
+> * imm[4:1] = 0000 = 0000
+> * imm[11] = 0 = 0
+> * Opcode for  beqz = 1100011    
+
+**32 bits instruction :** ```0_01111_00000_000_10101_0101_0_1100011```
+Hex: ``` 0x000078863005059b  ```
+
 
