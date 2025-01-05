@@ -178,7 +178,7 @@ lui a0, 0x2b
 > * Format: imm[31:12] | rd | opcode
 > *	imm[31:12] = 0x2b (0000000000101011)  
 > * Opcode for lui = 0110111   
-> * rd = a0 = 01000 
+> * rd = a0 = 010`0 
 
   
 **32 bits instruction :**```0000000000101011_01010_0110111```   
