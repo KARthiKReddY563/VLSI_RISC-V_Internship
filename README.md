@@ -200,7 +200,7 @@ addi sp, sp, -48
 > * func3 = 000 
 
   
-**32 bits instruction :** ```1111111111011000_00010_000_00010_0010011```   
+**32 bits instruction :** ```111111011000_00010_000_00010_0010011 111111010000_00010_000_00010_0010011```   
 
 Hex: ``` 0xFD010113  ```
 ________________________________________
@@ -211,14 +211,13 @@ sd ra, 40(sp)
 ```  
 > * Instruction Type: S-type (Store)
 > * Format: imm[11:5] | rs2 | rs1 | func3 | imm[4:0] | opcode
-> *	imm[11:5] = 40 = 000000010000
 > * Opcode for sd = 0100011  
 > * rs1 = sp = 00010
 > * rs2 = ra = 00001
 > * func3 = 011
 
   
-**32 bits instruction :** ```0000000_00001_00010_011_01000_0100011```  
+**32 bits instruction :** ```0000000_00001_00010_011_01000_0100011 0000001_00001_00010_011_01000_0100011 ```  
 
 Hex: ``` 0x02113423  ```
 ________________________________________
@@ -228,15 +227,15 @@ jal ra, 104d8
 > * Instruction Type:  J-type (Jump)
 > * Format:imm[20] | imm[10:1] | imm[11] | imm[19:12] | rd | opcode
 > *	imm[20] = 0
-> * imm[10:1] = 0000000001
+> * imm[10:1] =  1000001000
 > * imm[11] = 0
-> * imm[19:12] = 00010000
+> * imm[19:12] = 00000000
 > * imm[11] = 0
 > * Opcode for jal = 1101111  
 > * rd = ra = 00001
 
   
-**32 bits instruction :** ```0000000_0000000001_0_00010000_00001_1101111 ```
+**32 bits instruction :** ```0_1000001000_0_00000000_00001_1101111 ```
 
 Hex: ``` 0x410000ef  ```
 ```
@@ -251,20 +250,7 @@ lw s1, 12(sp)
 > * Opcode for lw = 0000011  
 
 **32 bits instruction :** ```000000001100_00010_010_01001_0000011```  
-Hex: ``` 0x410000ef  ```
-```
- blez s1, 10130
-```  
-> * Instruction Type:  B-type (Branch)
-> * Format: imm[12] | imm[10:5] | rs2 | rs1 | func3 | imm[4:1] | imm[11] | opcode
-> *	imm = 10130 = 0000001001100
-> * rs2 = zero = 00000
-> * rs1 = s1 = 10001
-> * func3 = 110
-> * Opcode for blez = 1100011   
-
-**32 bits instruction :** ```000000000000_01001_110_1010_11100011``` 
-Hex: ``` 0x410000ef  ```
+Hex: ``` 0x00c12483  ```
 
 ```
 mv a5, s1 
@@ -276,9 +262,9 @@ mv a5, s1
 > * rs1 = s1 = 10001
 > * func3 = 000
 > * func7 = 0000000 
-> * Opcode for mv = 0110011   
+> * Opcode for mv = 0010011   
 > * mv a5, s1 is Equivalent to addi a5, s1, 0
-**32 bits instruction :** ```0000000_00000_01001_000_01111_0110011``` 
+**32 bits instruction :** ```0000000_00000_01001_000_01111_0010011  `` 
 Hex: ``` 00048793  ```
 ________________________________________
 ```
@@ -293,7 +279,7 @@ li a1, 1
 > * Opcode for li = 0010011   
 
 **32 bits instruction :** ```000000000001_00000_000_01011_0010011``` 
-Hex: ``` 00100593  ```
+Hex: ``` 0x00100593  ```
 
 ```
 addiw s0, a5, -1
@@ -301,12 +287,12 @@ addiw s0, a5, -1
 > * Instruction Type:  I-type (Immediate Load)
 > * Format: imm[11:0] | rs1 | func3 | rd | opcode
 > *	imm[11:0] = -1 = 111111111111
-> * rs1 = a5 = 00101
-> * rd = s0 = 10000
+> * rs1 = a5 = x15=  01111
+> * rd = s0 = 01000
 > * func3 = 000
-> * Opcode for addiw = 0010011  
+> * Opcode for addiw = 0011011  
 
-**32 bits instruction :** ```111111111111_00101_000_10000_0011011``` 
+**32 bits instruction :** ```111111111111_00101_000_10000_0011011 111111111111_01111_000_01000_0011011``` 
 Hex: ``` fff7841b  ```
 ```
 sext.w a1, a0
@@ -316,49 +302,36 @@ sext.w a1, a0
 > * rs1 = a0 = 01010
 > * rs2 = zero = 00000
 > * rd = a1 = 01011
-> * func3 = 001
+> * func3 = 000
 > * func7 = 0000000
-> * Opcode for addiw = 0010011  
+> * Opcode for sext = 0011011  
 
-**32 bits instruction :** ```0000000_00000_01010_000_01011_0010011```
+**32 bits instruction :** ```0000000_00000_01010_000_01011_0011011```
 Hex: ``` 0x0005059b  ```
 ```
-bnez s0, 100ec
-```  
-> * Instruction Type:  B-type (Branch)
-> * Format:  imm[12] | imm[10:5] | rs2 | rs1 | func3 | imm[4:1] | imm[11] | opcode
-> imm[12|10:5] = 111111
-> * rs1 = s0 = 01000
-> * rs2 = zero = 00000
-> * func3 = 001
-> * imm[4:1|11] = 1100
-> * Opcode for bnez = 1100011  
 
-**32 bits instruction :** ```111111_00000_01000_001_1100_1100011```
-0xfe0416e3 Hex: ``` 0x0005059b  ```
-```
 ld ra, 40(sp)
 ```  
 > * Instruction Type:  I-type (Load)
 > * Format:  imm[11:0] | rs1 | func3 | rd | opcode
-> * imm[11:0] = 40 = 0000000001000000
+> * imm[11:0] = 40 = 000000101000
 > * rs1 = sp = 00010
 > * rd = ra = 00001
 > * func3 = 011
 > * Opcode for ld = 0000011  
 
-**32 bits instruction :** ```000000000100_00010_011_00001_0000011```
-Hex: ``` 0x00050x02812483059b  ```
+**32 bits instruction :** ```000000101000_00010_011_00010_0000011```
+Hex: ```0x02813083 ```
 ```
 auipc a5, 0xffff0
 ```  
 > * Instruction Type: AUIPC (Add Upper Immediate to PC)
 > * Format:   imm[31:12] | rd | opcode
-> * imm[31:12] = 111111111111000000 
-> * rd = 01111
+> * imm[31:12] = 11111111111111110000 
+> * rd = a5 = x15 = 01111
 > * Opcode for auipc = 0010111   
 
-**32 bits instruction :** ```111111111111_000000_01111_0010111```
+**32 bits instruction :** ```11111111111111110000_01111_0010111```
 Hex: ``` 0xffff0797  ```
 ```
  beqz a5, 10150 <register_fini+0x18>
@@ -368,13 +341,13 @@ Hex: ``` 0xffff0797  ```
 > * imm[12] = 0 = 0 
 > * imm[10:5] = 0000000 = 0000000
 > * rs2 = 00000 = 00000
-> * rs1 = a5 = 00101 = 00101
+> * rs1 = a5 = x15 = 011111
 > * func3 = 000 = 000
-> * imm[4:1] = 0000 = 0000
+> * imm[4:1] =  1000
 > * imm[11] = 0 = 0
 > * Opcode for  beqz = 1100011    
 
-**32 bits instruction :** ```0_01111_00000_000_10101_0101_0_1100011```
-Hex: ``` 0x000078863005059b  ```
+**32 bits instruction :** ```0_000000_00000_01111_000_1000_0_1100011```
+Hex: ``` 0x00078863  ```
 
 
